@@ -1,20 +1,29 @@
-# Step 1: Use the official Node.js image as a base
-FROM node:16-alpine
+# Step 1: Build the Vite app
+FROM node:16-alpine AS build
 
-# Step 2: Set the working directory in the container
 WORKDIR /app
 
-# Step 3: Copy package.json and package-lock.json
+# Copy package.json and install dependencies
 COPY package*.json ./
-
-# Step 4: Install dependencies
 RUN npm install
 
-# Step 5: Copy the rest of the application code
+# Copy the rest of the app and build it
 COPY . .
+RUN npm run build
 
-# Step 6: Expose the port that Vite uses (default is 5173)
+# Step 2: Serve the app using 'serve'
+FROM node:16-alpine
+
+WORKDIR /app
+
+# Install the 'serve' package globally
+RUN npm install -g serve
+
+# Copy the build output from the previous stage
+COPY --from=build /app/dist ./dist
+
+# Expose Vite's default port
 EXPOSE 5173
 
-# Step 7: Run Vite dev server (not recommended for production)
-CMD ["npm", "run"]
+# Start the server
+CMD ["serve", "-s", "dist", "-l", "5173"]
