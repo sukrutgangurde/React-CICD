@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5173
 
 # Step 7: Run Vite dev server (not recommended for production)
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run"]
